@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="text" format="string"/>
+    <attr name="indicatorColor" format="color"/>
+    <attr name="indicatorBackgroundColor" format="color"/>
+    <attr name="multiple" format="integer"/>
+    
+    <declare-styleable name="LoadingView">
+        <attr name="text"/>
+    </declare-styleable>
+    
+    <declare-styleable name="ProgressView">
+        <attr name="indicatorColor"/>
+        <attr name="indicatorBackgroundColor"/>
+    </declare-styleable>
+    
+    <declare-styleable name="ControlLayout">
+        <attr name="multiple"/>
+    </declare-styleable>
+</resources>

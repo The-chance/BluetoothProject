@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/bluetoothConnection"
+        android:icon="@drawable/connectbracelet"
+        android:title="蓝牙连接" />
+    
+    <item
+        android:id="@+id/wifiConnection"
+        android:icon="@drawable/airconditioner"
+        android:title="WiFi连接" />
+        
+<!--    <item-->
+<!--        android:id="@+id/roomConnection"-->
+<!--        android:icon="@drawable/fan"-->
+<!--        android:title="WiFi连接房间" />-->
+
+<!--    <item-->
+<!--        android:id="@+id/connectWindow"-->
+<!--        android:icon="@drawable/window"-->
+<!--        android:title="连接窗户" />-->
+
+</menu>

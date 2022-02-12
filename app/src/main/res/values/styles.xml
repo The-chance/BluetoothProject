@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!--    需要添加com.google.android.material-->
+    <!--    很多Material Design UI要求必须使用MaterialComponents主题-->
+    <style name="MaterialAppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    
+    <style name="ToolBarAppTheme" parent="MaterialAppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- 修改右侧溢出菜单,副标题,navigation 的颜色-->
+        <item name="android:textColorSecondary">@color/white</item>
+        <!-- 设置文字颜色的-->
+        <item name="android:textColorPrimary">@color/white</item>
+        <!-- 设置文字大小的-->
+        <item name="android:textSize">16sp</item>
+        <!-- 注意设置的位置  -->
+        <item name="actionOverflowButtonStyle">@style/OverflowTheme</item>
+        <item name="toolbarStyle">@style/NoSpaceActionBarTheme</item>
+    </style>
+    
+    <!--navigationIcon和Title的距离问题-->
+    <style name="NoSpaceActionBarTheme" parent="Base.Widget.AppCompat.Toolbar">
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+    </style>
+    
+    <!--TextInputLayout的文字修改-->
+    <style name="TextInputLayoutStyle">
+        <item name="android:textSize">20sp</item>
+        <!--这个是控制你输入的字母大小写的！-->
+        <item name="android:textColor">#91452e</item>
+    </style>
+    
+</resources>

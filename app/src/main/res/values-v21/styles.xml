@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <style name="ImmersiveTheme" parent="ToolBarAppTheme">
+        <!-- 下面两条属性是Android 4.4版本以上才能设置 -->
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <!-- 下面这条属性是Android 5.0版本以上才能设置 -->
+        <!-- 从Android 5.0开始需要把颜色设置为透明，否则导航栏会呈现系统默认的浅灰色 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>
