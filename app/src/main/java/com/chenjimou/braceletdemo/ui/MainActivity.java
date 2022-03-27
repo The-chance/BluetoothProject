@@ -2,7 +2,6 @@ package com.chenjimou.braceletdemo.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.view.Menu;
@@ -12,79 +11,37 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.chenjimou.braceletdemo.R;
-import com.chenjimou.braceletdemo.base.ConnectionHelper;
-import com.chenjimou.braceletdemo.commend.HoldBluetoothConnectionCommend;
-import com.chenjimou.braceletdemo.commend.BluetoothSendDataCommend;
-import com.chenjimou.braceletdemo.commend.HoldWiFiConnectionCommend;
-import com.chenjimou.braceletdemo.commend.WiFiSendDataCommend;
+import com.chenjimou.braceletdemo.base.BaseApplication;
+import com.chenjimou.braceletdemo.order.Order;
+import com.chenjimou.braceletdemo.thread.HoldConnectionThread;
 import com.chenjimou.braceletdemo.databinding.ActivityMainBinding;
-import com.chenjimou.braceletdemo.service.BraceletServiceConnection;
+import com.chenjimou.braceletdemo.order.OrderType;
 import com.chenjimou.braceletdemo.widght.ControlLayout;
-import com.google.android.material.navigation.NavigationView;
+import com.chenjimou.braceletdemo.widght.SafeHandler;
+
+import java.util.Calendar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
 
-public class MainActivity extends AppCompatActivity implements HoldBluetoothConnectionCommend.OnCallBackListener,
-        HoldWiFiConnectionCommend.OnCallBackListener
+public class MainActivity extends AppCompatActivity
 {
     private ActivityMainBinding mBinding;
 
-    ActionBarDrawerToggle mDrawerToggle;
-
     private static final int BLUETOOTH_REQUEST_CODE = 0;
     private static final int WIFI_REQUEST_CODE = 1;
-    private static final int COMMUNICATION_EXCEPTION = 2;
-    private static final int FAN_COMMUNICATION_SUCCESS = 3;
-    private static final int AIR_CONDITIONER_COMMUNICATION_SUCCESS = 4;
-    private static final int WINDOW_COMMUNICATION_SUCCESS = 5;
 
-    private final Handler handler = new Handler(Looper.getMainLooper())
-    {
-        @Override
-        public void handleMessage(@NonNull Message msg)
-        {
-            switch (msg.what)
-            {
-                case COMMUNICATION_EXCEPTION:
-                    Toast.makeText(MainActivity.this,"指令发送失败，请重试！",Toast.LENGTH_SHORT).show();
-                    break;
-                case FAN_COMMUNICATION_SUCCESS:
-                    if (msg.getData().getBoolean("isUp"))
-                    {
-                        mBinding.appBarMain.fanControlLayout.increase();
-                    }
-                    else
-                    {
-                        mBinding.appBarMain.fanControlLayout.reduce();
-                    }
-                    break;
-                case AIR_CONDITIONER_COMMUNICATION_SUCCESS:
-                    if (msg.getData().getBoolean("isUp"))
-                    {
-                        mBinding.appBarMain.airConditionerControlLayout.increase();
-                    }
-                    else
-                    {
-                        mBinding.appBarMain.airConditionerControlLayout.reduce();
-                    }
-                    break;
-                case WINDOW_COMMUNICATION_SUCCESS:
-                    if (msg.getData().getBoolean("isUp"))
-                    {
-                        mBinding.appBarMain.windowControlLayout.increase();
-                    }
-                    else
-                    {
-                        mBinding.appBarMain.windowControlLayout.reduce();
-                    }
-                    break;
-            }
-        }
-    };
+    private static final int EXCEPTION = 2;
+    private static final int FAN = 3;
+    private static final int AIR_CONDITIONER = 4;
+    private static final int WINDOW = 5;
+    private static final int BRACELET = 6;
+
+    final SafeHandler<MainActivity> handler = new SafeHandler<>(this, Looper.getMainLooper());
+
+    HoldConnectionThread wifiThread;
+    HoldConnectionThread btThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -101,32 +58,6 @@ public class MainActivity extends AppCompatActivity implements HoldBluetoothConn
         mBinding.appBarMain.toolbar.setTitle("");
         mBinding.appBarMain.tvTitle.setText("智慧家居");
         setSupportActionBar(mBinding.appBarMain.toolbar);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, mBinding.drawerLayout, mBinding.appBarMain.toolbar,
-                R.drawable.navigation, R.drawable.navigation) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-        };
-        mDrawerToggle.syncState();
-        mBinding.drawerLayout.addDrawerListener(mDrawerToggle);
-
-        mBinding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
-        {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item)
-            {
-                mBinding.drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
 
         mBinding.appBarMain.airConditionerControlLayout.setValueRange(0, 39);
         mBinding.appBarMain.airConditionerControlLayout.setOnSendDataListener(new ControlLayout.OnSendDataListener()
@@ -190,8 +121,6 @@ public class MainActivity extends AppCompatActivity implements HoldBluetoothConn
                 }
             }
         });
-
-        BraceletServiceConnection.getInstance().tryConnection();
     }
 
     @Override
@@ -223,132 +152,156 @@ public class MainActivity extends AppCompatActivity implements HoldBluetoothConn
         }
     }
 
-    private void sendDataToBracelet(String msg)
+    private void sendDataToBracelet(String order)
     {
-        new Thread(new Runnable()
+        BaseApplication.sendOrder(new Order(OrderType.TYPE_BRACELET, order, new Order.Callback()
         {
             @Override
-            public void run()
+            public void onFailure(Exception e)
             {
-                Exception exception = BraceletServiceConnection.getInstance()
-                        .sendCommend(new BluetoothSendDataCommend(ConnectionHelper.bluetoothSocket, msg));
-                if (exception != null)
-                {
-                    handler.sendEmptyMessage(COMMUNICATION_EXCEPTION);
-                }
+                handler.sendEmptyMessage(EXCEPTION);
             }
-        }).start();
+
+            @Override
+            public void onResponse()
+            {
+                // do nothing
+            }
+        }));
     }
 
-    private void sendDataToAirConditioner(String msg, boolean isUp)
+    private void sendDataToAirConditioner(String order, boolean isUp)
     {
-        new Thread(new Runnable()
+        BaseApplication.sendOrder(new Order(OrderType.TYPE_AIR_CONDITIONER, order, new Order.Callback()
         {
             @Override
-            public void run()
+            public void onFailure(Exception e)
             {
-                Exception exception = BraceletServiceConnection.getInstance()
-                        .sendCommend(new WiFiSendDataCommend(ConnectionHelper.wifiSocket, msg));
-                if (exception != null)
-                {
-                    handler.sendEmptyMessage(COMMUNICATION_EXCEPTION);
-                }
-                else
-                {
-                    Message msg = new Message();
-                    msg.what = AIR_CONDITIONER_COMMUNICATION_SUCCESS;
-                    Bundle bundle = new Bundle();
-                    bundle.putBoolean("isUp", isUp);
-                    msg.setData(bundle);
-                    handler.sendMessage(msg);
-                }
+                handler.sendEmptyMessage(EXCEPTION);
             }
-        }).start();
+
+            @Override
+            public void onResponse()
+            {
+                Message message = Message.obtain();
+                message.what = AIR_CONDITIONER;
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isUp", isUp);
+                message.setData(bundle);
+                handler.sendMessage(message);
+            }
+        }));
     }
 
-    private void sendDataToFan(String msg, boolean isUp)
+    private void sendDataToFan(String order, boolean isUp)
     {
-        new Thread(new Runnable()
+        BaseApplication.sendOrder(new Order(OrderType.TYPE_FAN, order, new Order.Callback()
         {
             @Override
-            public void run()
+            public void onFailure(Exception e)
             {
-                Exception exception = BraceletServiceConnection.getInstance()
-                        .sendCommend(new WiFiSendDataCommend(ConnectionHelper.wifiSocket, msg));
-                if (exception != null)
-                {
-                    handler.sendEmptyMessage(COMMUNICATION_EXCEPTION);
-                }
-                else
-                {
-                    Message msg = new Message();
-                    msg.what = WINDOW_COMMUNICATION_SUCCESS;
-                    Bundle bundle = new Bundle();
-                    bundle.putBoolean("isUp", isUp);
-                    msg.setData(bundle);
-                    handler.sendMessage(msg);
-                }
+                handler.sendEmptyMessage(EXCEPTION);
             }
-        }).start();
+
+            @Override
+            public void onResponse()
+            {
+                Message message = Message.obtain();
+                message.what = FAN;
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isUp", isUp);
+                message.setData(bundle);
+                handler.sendMessage(message);
+            }
+        }));
     }
 
-    private void sendDataToWindow(String msg, boolean isUp)
+    private void sendDataToWindow(String order, boolean isUp)
     {
-        new Thread(new Runnable()
+        BaseApplication.sendOrder(new Order(OrderType.TYPE_WINDOW, order, new Order.Callback()
         {
             @Override
-            public void run()
+            public void onFailure(Exception e)
             {
-                Exception exception = BraceletServiceConnection.getInstance()
-                        .sendCommend(new WiFiSendDataCommend(ConnectionHelper.wifiSocket, msg));
-                if (exception != null)
-                {
-                    handler.sendEmptyMessage(COMMUNICATION_EXCEPTION);
-                }
-                else
-                {
-                    Message msg = new Message();
-                    msg.what = FAN_COMMUNICATION_SUCCESS;
-                    Bundle bundle = new Bundle();
-                    bundle.putBoolean("isUp", isUp);
-                    msg.setData(bundle);
-                    handler.sendMessage(msg);
-                }
+                handler.sendEmptyMessage(EXCEPTION);
             }
-        }).start();
+
+            @Override
+            public void onResponse()
+            {
+                Message message = Message.obtain();
+                message.what = WINDOW;
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isUp", isUp);
+                message.setData(bundle);
+                handler.sendMessage(message);
+            }
+        }));
     }
 
     private void holdBluetoothConnection()
     {
-        HoldBluetoothConnectionCommend commend = new HoldBluetoothConnectionCommend(ConnectionHelper.bluetoothSocket);
-        commend.setOnCallBackListener(this);
-        BraceletServiceConnection.getInstance().sendCommend(commend);
+        btThread = new HoldConnectionThread(false, msg ->
+        {
+            if (msg.contains("#DATE"))
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append("#TIME");
+                Calendar calendar = Calendar.getInstance();
+                sb.append(calendar.get(Calendar.YEAR));
+                sb.append(calendar.get(Calendar.MONTH + 1));
+                sb.append(calendar.get(Calendar.DATE));
+                sb.append(calendar.get(Calendar.HOUR_OF_DAY));
+                sb.append(calendar.get(Calendar.MINUTE));
+                sb.append(calendar.get(Calendar.SECOND));
+                sendDataToBracelet(sb.toString());
+            }
+            else if (msg.contains("#TEMP"))
+            {
+                String[] strings = msg.split("#TEMP");
+                Message message = Message.obtain();
+                message.what = BRACELET;
+                Bundle bundle = new Bundle();
+                bundle.putString("temp", strings[1]);
+                message.setData(bundle);
+                handler.sendMessage(message);
+            }
+        });
+        btThread.start();
     }
 
     private void holdWiFiConnection()
     {
-        HoldWiFiConnectionCommend commend = new HoldWiFiConnectionCommend(ConnectionHelper.wifiSocket);
-        commend.setOnCallBackListener(this);
-        BraceletServiceConnection.getInstance().sendCommend(commend);
+        wifiThread = new HoldConnectionThread(true, msg ->
+        {
+            // do nothing
+        });
+        wifiThread.start();
     }
 
-    @Override
-    public void bluetoothCallBack(String msg)
+    public void handleMessage(Message msg)
     {
-        if (msg.contains("#TIME"))
+        switch (msg.what)
         {
-            sendDataToBracelet(msg);
+            case EXCEPTION:
+                Toast.makeText(MainActivity.this,"指令发送失败，请重试！",Toast.LENGTH_SHORT).show();
+                break;
+            case FAN:
+                if (msg.getData().getBoolean("isUp")) mBinding.appBarMain.fanControlLayout.increase();
+                else mBinding.appBarMain.fanControlLayout.reduce();
+                break;
+            case AIR_CONDITIONER:
+                if (msg.getData().getBoolean("isUp")) mBinding.appBarMain.airConditionerControlLayout.increase();
+                else mBinding.appBarMain.airConditionerControlLayout.reduce();
+                break;
+            case WINDOW:
+                if (msg.getData().getBoolean("isUp")) mBinding.appBarMain.windowControlLayout.increase();
+                else mBinding.appBarMain.windowControlLayout.reduce();
+                break;
+            case BRACELET:
+                mBinding.appBarMain.tvTemperature.setText(msg.getData().getString("temp"));
+                break;
         }
-        else
-        {
-            mBinding.appBarMain.tvTemperature.setText(msg);
-        }
-    }
-
-    @Override
-    public void wifiCallBack(String msg)
-    {
-
     }
 
     @Override
@@ -361,19 +314,13 @@ public class MainActivity extends AppCompatActivity implements HoldBluetoothConn
                 if (resultCode == RESULT_OK)
                 {
                     mBinding.appBarMain.tvBraceletState.setVisibility(View.GONE);
-                    if (ConnectionHelper.bluetoothSocket != null)
-                    {
-                        holdBluetoothConnection();
-                    }
+                    holdBluetoothConnection();
                 }
                 break;
             case WIFI_REQUEST_CODE:
                 if (resultCode == RESULT_OK)
                 {
-                    if (ConnectionHelper.wifiSocket != null)
-                    {
-                        holdWiFiConnection();
-                    }
+                    holdWiFiConnection();
                 }
                 break;
         }
@@ -383,14 +330,6 @@ public class MainActivity extends AppCompatActivity implements HoldBluetoothConn
     protected void onDestroy()
     {
         super.onDestroy();
-        BraceletServiceConnection.getInstance().disConnection();
-        try
-        {
-            ConnectionHelper.reset();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        wifiThread.interrupt();
     }
 }

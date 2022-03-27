@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.chenjimou.braceletdemo.R;
-import com.chenjimou.braceletdemo.uitls.DisplayUtils;
 
 import androidx.annotation.Nullable;
 

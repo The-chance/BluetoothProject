@@ -25,7 +25,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -33,13 +32,10 @@ import android.widget.Toast;
 
 import com.chenjimou.braceletdemo.R;
 import com.chenjimou.braceletdemo.base.BaseApplication;
-import com.chenjimou.braceletdemo.base.ConnectionHelper;
-import com.chenjimou.braceletdemo.commend.WiFiSendDataCommend;
 import com.chenjimou.braceletdemo.databinding.ActivityWifiConnectBinding;
-import com.chenjimou.braceletdemo.service.BraceletServiceConnection;
+import com.chenjimou.braceletdemo.widght.SafeHandler;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 
@@ -89,7 +85,6 @@ public class WiFiConnectActivity extends AppCompatActivity
                     wifiManager.disconnect();
                     isFound = false;
                     isConnection = false;
-                    ConnectionHelper.isConnectRoom = true;
                     trySearchWiFi();
                     break;
                 case WIFI_SOCKET_EXCEPTION:
@@ -101,6 +96,7 @@ public class WiFiConnectActivity extends AppCompatActivity
                             Toast.LENGTH_SHORT).show();
                     isConnection = true;
                     tryConnectRoom();
+                    finish();
                     break;
                 case WIFI_CONNECT_FAIL:
                     Toast.makeText(WiFiConnectActivity.this, "未能连接上目标wifi，请重试！",
@@ -124,7 +120,7 @@ public class WiFiConnectActivity extends AppCompatActivity
     private void init()
     {
         // 获取获取Application的WifiManager
-        wifiManager = (WifiManager)BaseApplication.sApplication.getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager)BaseApplication.altContext.getSystemService(Context.WIFI_SERVICE);
 
         mBinding.toolbar.setTitle("");
         mBinding.tvTitle.setText("WiFi连接模块");
@@ -218,13 +214,13 @@ public class WiFiConnectActivity extends AppCompatActivity
                         final WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                         if (!isConnection)
                         {
-                            if (wifiInfo.getSSID().equals("\"" + TARGET_WIFI_NAME + "\"") && !ConnectionHelper.isConnectRoom)
+                            if (wifiInfo.getSSID().equals("\"" + TARGET_WIFI_NAME + "\""))
                             {
                                 Toast.makeText(WiFiConnectActivity.this, "已成功连接上目标WiFi！", Toast.LENGTH_SHORT).show();
                                 isConnection = true;
                                 tryConnectRoom();
                             }
-                            else if (wifiInfo.getSSID().equals("\"" + TARGET_WIFI_NAME + "\"") && ConnectionHelper.isConnectRoom)
+                            else if (wifiInfo.getSSID().equals("\"" + TARGET_WIFI_NAME + "\""))
                             {
                                 Toast.makeText(WiFiConnectActivity.this, "已成功连接上目标WiFi！", Toast.LENGTH_SHORT).show();
                                 isConnection = true;
@@ -284,7 +280,7 @@ public class WiFiConnectActivity extends AppCompatActivity
                     {
                         try
                         {
-                            ConnectionHelper.wifiSocket = new Socket(editText1.getText().toString(), 5000);
+                            BaseApplication.wifiSocket = new Socket(editText1.getText().toString(), 5000);
                         }
                         catch (Exception e)
                         {
@@ -294,16 +290,16 @@ public class WiFiConnectActivity extends AppCompatActivity
                         TARGET_WIFI_NAME = editText2.getText().toString();
                         TARGET_WIFI_PASSWORD = editText3.getText().toString();
                         String msg = "#WIFINAME" + TARGET_WIFI_NAME + "NEND" + "#WIFIPASSWORD" + TARGET_WIFI_PASSWORD + "PEND";
-                        Exception exception = BraceletServiceConnection.getInstance()
-                                .sendCommend(new WiFiSendDataCommend(ConnectionHelper.wifiSocket, msg));
-                        if (exception != null)
-                        {
-                            handler.sendEmptyMessage(WIFI_COMMUNICATION_EXCEPTION);
-                        }
-                        else
-                        {
-                            handler.sendEmptyMessage(WIFI_COMMUNICATION_SUCCESS);
-                        }
+//                        Exception exception = BraceletServiceConnection.getInstance()
+//                                .sendCommend(new WiFiSendDataCommend(BaseApplication.wifiSocket, msg));
+//                        if (exception != null)
+//                        {
+//                            handler.sendEmptyMessage(WIFI_COMMUNICATION_EXCEPTION);
+//                        }
+//                        else
+//                        {
+//                            handler.sendEmptyMessage(WIFI_COMMUNICATION_SUCCESS);
+//                        }
                     }
                 }).start();
             }
@@ -403,7 +399,7 @@ public class WiFiConnectActivity extends AppCompatActivity
             {
                 try
                 {
-                    ConnectionHelper.wifiSocket = new Socket(editText.getText().toString(), 5000);
+                    BaseApplication.wifiSocket = new Socket(editText.getText().toString(), 5000);
                     WiFiConnectActivity.this.setResult(RESULT_OK);
                     finish();
                 }

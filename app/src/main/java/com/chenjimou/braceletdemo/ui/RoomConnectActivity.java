@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.chenjimou.braceletdemo.R;
 import com.chenjimou.braceletdemo.base.BaseApplication;
 import com.chenjimou.braceletdemo.databinding.ActivityRoomConnectBinding;
 
@@ -33,7 +32,7 @@ public class RoomConnectActivity extends AppCompatActivity
     private void init()
     {
         // 获取获取Application的WifiManager
-        wifiManager = (WifiManager) BaseApplication.sApplication.getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager) BaseApplication.altContext.getSystemService(Context.WIFI_SERVICE);
 
         mBinding.toolbar.setTitle("");
         mBinding.tvTitle.setText("WiFi连接房间");

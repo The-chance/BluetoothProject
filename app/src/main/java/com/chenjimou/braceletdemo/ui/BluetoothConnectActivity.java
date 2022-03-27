@@ -18,7 +18,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.chenjimou.braceletdemo.base.ConnectionHelper;
+import com.chenjimou.braceletdemo.base.BaseApplication;
 import com.chenjimou.braceletdemo.databinding.ActivityBluetoothConnectBinding;
 
 import java.util.Set;
@@ -86,8 +86,6 @@ public class BluetoothConnectActivity extends AppCompatActivity
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        new Thread().interrupt();
     }
 
     @Override
@@ -132,7 +130,7 @@ public class BluetoothConnectActivity extends AppCompatActivity
                                 Toast.makeText(BluetoothConnectActivity.this, "查找成功，正在尝试配对！",
                                         Toast.LENGTH_SHORT).show();
                                 isFound = true;
-                                ConnectionHelper.bluetoothDevice = device;
+                                BaseApplication.btDevice = device;
                                 tryBond(device);
                             }
                         }
@@ -145,14 +143,14 @@ public class BluetoothConnectActivity extends AppCompatActivity
                         }
                         break;
                     case BluetoothDevice.ACTION_BOND_STATE_CHANGED:
-                        if (ConnectionHelper.bluetoothDevice != null)
+                        if (BaseApplication.btDevice != null)
                         {
-                            switch (ConnectionHelper.bluetoothDevice.getBondState())
+                            switch (BaseApplication.btDevice.getBondState())
                             {
                                 case BluetoothDevice.BOND_BONDED:// 配对成功
                                     Toast.makeText(BluetoothConnectActivity.this, "配对成功，正在进行连接！",
                                             Toast.LENGTH_SHORT).show();
-                                    tryConnect(ConnectionHelper.bluetoothDevice);
+                                    tryConnect(BaseApplication.btDevice);
                                     break;
                                 case BluetoothDevice.BOND_BONDING:// 配对中
                                     Toast.makeText(BluetoothConnectActivity.this, "配对中，请稍后...",
@@ -187,7 +185,7 @@ public class BluetoothConnectActivity extends AppCompatActivity
                 Toast.makeText(BluetoothConnectActivity.this, "该蓝牙设备已配对，正在进行连接！",
                         Toast.LENGTH_SHORT).show();
                 isFound = true;
-                ConnectionHelper.bluetoothDevice = device;
+                BaseApplication.btDevice = device;
                 tryConnect(device);
                 return;
             }
@@ -215,16 +213,17 @@ public class BluetoothConnectActivity extends AppCompatActivity
             {
                 try
                 {
-                    // todo 通过socket连接到远程设备。此调用将阻塞，直到成功或引发异常
-                    ConnectionHelper.bluetoothSocket = device.createRfcommSocketToServiceRecord(device.getUuids()[0].getUuid());
-                    ConnectionHelper.bluetoothSocket.connect();
+
+                    BaseApplication.btSocket = device.createRfcommSocketToServiceRecord(device.getUuids()[0].getUuid());
+                    // 通过socket连接到对端硬件设备。此调用将阻塞，直到成功或引发异常
+                    BaseApplication.btSocket.connect();
                 }
                 catch (Exception e1)
                 {
                     e1.printStackTrace();
                     try
                     {
-                        ConnectionHelper.bluetoothSocket.close();
+                        BaseApplication.btSocket.close();
                         handler.sendEmptyMessage(BLUETOOTH_CONNECT_EXCEPTION);
                     }
                     catch (Exception e2)

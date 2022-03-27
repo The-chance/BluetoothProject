@@ -2,11 +2,9 @@ package com.chenjimou.braceletdemo.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.chenjimou.braceletdemo.R;
-import com.chenjimou.braceletdemo.service.BraceletServiceConnection;
 
 import androidx.annotation.NonNull;
 
