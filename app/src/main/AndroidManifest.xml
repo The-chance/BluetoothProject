@@ -27,7 +27,7 @@
             android:name=".ui.WiFiConnectActivity"
             android:theme="@style/ImmersiveTheme" />
         <activity
-            android:name=".ui.BluetoothConnectActivity"
+            android:name=".ui.btConnectActivity"
             android:theme="@style/ImmersiveTheme" />
         <activity
             android:name=".ui.MainActivity"
