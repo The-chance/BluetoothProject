@@ -3,10 +3,10 @@ package com.chenjimou.braceletdemo.widght;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-
-import com.chenjimou.braceletdemo.ui.MainActivity;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 
 import androidx.annotation.NonNull;
 
@@ -24,9 +24,15 @@ public class SafeHandler<T> extends Handler
     public void handleMessage(@NonNull Message msg)
     {
         T thiz = mContext.get();
-        if (thiz instanceof MainActivity)
+        Class<?> thizClass = thiz.getClass();
+        try
         {
-            ((MainActivity)thiz).handleMessage(msg);
+            Method method = thizClass.getDeclaredMethod("handleMessage", Message.class);
+            method.invoke(thiz, msg);
+        }
+        catch (Exception e)
+        {
+            Log.e("SafeHandler", "请在"+thizClass.getSimpleName()+"类中定义handleMessage函数", e);
         }
     }
 }

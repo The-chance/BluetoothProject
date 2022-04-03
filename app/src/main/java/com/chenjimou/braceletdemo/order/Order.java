@@ -44,7 +44,7 @@ public class Order implements Runnable
             }
             callback.onResponse();
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             callback.onFailure(e);
         }
