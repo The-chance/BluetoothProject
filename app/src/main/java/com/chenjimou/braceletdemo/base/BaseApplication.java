@@ -11,8 +11,8 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class BaseApplication extends Application
-{
+public class BaseApplication extends Application {
+
     public static Application altContext; // APP程序上下文
     public static BluetoothSocket btSocket; // 当前蓝牙通信使用的socket
     public static BluetoothDevice btDevice; // 对端蓝牙设备对象

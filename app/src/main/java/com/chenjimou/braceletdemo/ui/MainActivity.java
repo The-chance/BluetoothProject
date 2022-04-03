@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity
     private static final int AIR_CONDITIONER = 4;
     private static final int WINDOW = 5;
     private static final int BRACELET = 6;
-
     final SafeHandler<MainActivity> handler = new SafeHandler<>(this, Looper.getMainLooper());
 
     HoldConnectionThread wifiThread;
@@ -152,6 +151,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * 发送数据给手环
+     * @param order
+     */
     private void sendDataToBracelet(String order)
     {
         BaseApplication.sendOrder(new Order(OrderType.TYPE_BRACELET, order, new Order.Callback()
@@ -270,6 +273,9 @@ public class MainActivity extends AppCompatActivity
         btThread.start();
     }
 
+    /**
+     * 从连接后返回MainActivity时会被调用
+     */
     private void holdWiFiConnection()
     {
         wifiThread = new HoldConnectionThread(true, msg ->
