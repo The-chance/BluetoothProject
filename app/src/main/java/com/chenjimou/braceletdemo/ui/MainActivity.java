@@ -28,22 +28,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity
 {
-<<<<<<< HEAD
-    private ActivityMainBinding mBinding;
-
-    private static final int BLUETOOTH_REQUEST_CODE = 0;
-    private static final int WIFI_REQUEST_CODE = 1;
-
-    private static final int EXCEPTION = 2;
-    private static final int FAN = 3;
-    private static final int AIR_CONDITIONER = 4;
-    private static final int WINDOW = 5;
-    private static final int BRACELET = 6;
-=======
     ActivityMainBinding mBinding;
 
     /* 安全的Handler，避免Activity直接与后台线程绑定(内部类)导致内存泄漏 */
->>>>>>> 6389a6554f70b131857747513323071fda566c89
     final SafeHandler<MainActivity> handler = new SafeHandler<>(this, Looper.getMainLooper());
 
     /* 监听对端蓝牙设备的线程 */
@@ -280,7 +267,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * 开启WiFi监听线程
+     * 开启蓝牙监听线程
      */
     void holdBluetoothConnection()
     {
@@ -314,15 +301,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-<<<<<<< HEAD
-     * 从连接后返回MainActivity时会被调用
-     */
-    private void holdWiFiConnection()
-=======
-     * 开启蓝牙监听线程
+     * 开启WiFi监听线程
      */
     void holdWiFiConnection()
->>>>>>> 6389a6554f70b131857747513323071fda566c89
     {
         wifiThread = new HoldConnectionThread(true, msg ->
         {
