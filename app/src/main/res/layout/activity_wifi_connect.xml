@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,18 +7,20 @@
     android:layout_height="match_parent"
     android:background="@color/Light_Blue300"
     android:orientation="vertical">
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:orientation="vertical">
-        
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-            
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/ToolBarPopupTheme">
+
             <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
@@ -27,14 +29,38 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-        
+            <!--            <TextView-->
+            <!--                android:id="@+id/toWiFiSetting"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:text="WiFi设置"-->
+            <!--                android:layout_gravity="end|center_vertical"-->
+            <!--                android:layout_marginRight="20dp"-->
+            <!--                android:layout_marginEnd="20dp"-->
+            <!--                android:textColor="@color/tv_wifisetting_selector"-->
+            <!--                android:textSize="14sp"/>-->
+
         </androidx.appcompat.widget.Toolbar>
-    
+
     </LinearLayout>
-    
+
     <com.chenjimou.braceletdemo.widght.LoadingView
+        android:id="@+id/loadingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:text="正在连接中..."/>
+        app:text="" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/connectStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="未连接"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/loadingView"
+        app:layout_constraintEnd_toEndOf="@+id/loadingView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
