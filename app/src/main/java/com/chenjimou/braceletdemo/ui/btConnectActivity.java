@@ -265,5 +265,5 @@ public class btConnectActivity extends AppCompatActivity
 
     private static final int EXCEPTION = 0;
     private static final int SUCCESS = 1;
-    private static final String BLUETOOTH_NAME = "Bracelet";
+    private static final String BLUETOOTH_NAME = "HC-06_123";
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.chenjimou.braceletdemo.widght.ControlLayout;
 import com.chenjimou.braceletdemo.widght.SafeHandler;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,9 +30,25 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity
 {
-    ActivityMainBinding mBinding;
+    private ActivityMainBinding mBinding;
+
+    private static final int BLUETOOTH_REQUEST_CODE = 0;
+    private static final int WIFI_REQUEST_CODE = 1;
+
+    private static final int EXCEPTION = 2;
+    private static final int FAN = 3;
+    private static final int AIR_CONDITIONER = 4;
+    private static final int WINDOW = 5;
+    private static final int BRACELET = 6;
+    private static final int FAILL= 7;
+
+    private static final int BLUETOOTH=0;
+    private static final int WIFI=1;
+
+
 
     /* 安全的Handler，避免Activity直接与后台线程绑定(内部类)导致内存泄漏 */
+
     final SafeHandler<MainActivity> handler = new SafeHandler<>(this, Looper.getMainLooper());
 
     /* 监听对端蓝牙设备的线程 */
@@ -167,18 +185,22 @@ public class MainActivity extends AppCompatActivity
      */
     private void sendDataToBracelet(String order)
     {
+
+        Log.d("MainActivity", "clicksend");
         Dispatcher.getInstance().sendOrder(new Order(OrderType.TYPE_BRACELET, order, new Order.Callback()
         {
             @Override
             public void onFailure(Exception e)
             {
+                Log.d("MainActivity", "onFailure ");
                 handler.sendEmptyMessage(EXCEPTION);
             }
 
             @Override
             public void onResponse()
             {
-                // do nothing
+                Log.d("MainActivity", "onResponse: ");
+                //最终手机蓝牙收到信号，将时间信息发送给
             }
         }));
     }
@@ -271,39 +293,63 @@ public class MainActivity extends AppCompatActivity
      */
     void holdBluetoothConnection()
     {
+        Log.d("TAG", "holdBluetoothConnection: ");
+
         btThread = new HoldConnectionThread(false, msg ->
         {
-            if (msg.contains("#DATE"))
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.append("#TIME");
-                Calendar calendar = Calendar.getInstance();
-                sb.append(calendar.get(Calendar.YEAR));
-                sb.append(calendar.get(Calendar.MONTH + 1));
-                sb.append(calendar.get(Calendar.DATE));
-                sb.append(calendar.get(Calendar.HOUR_OF_DAY));
-                sb.append(calendar.get(Calendar.MINUTE));
-                sb.append(calendar.get(Calendar.SECOND));
-                sendDataToBracelet(sb.toString());
-            }
-            else if (msg.contains("#TEMP"))
-            {
-                String[] strings = msg.split("#TEMP");
+            Log.d("TAG", "holdBluetoothConnection: "+msg);
+            //这里传进来依然是字节流的形式，转化为String形式
+
+            if (msg.equals("faill")){
                 Message message = Message.obtain();
-                message.what = BRACELET;
-                Bundle bundle = new Bundle();
-                bundle.putString("temp", strings[1]);
-                message.setData(bundle);
+                message.what=FAILL;
                 handler.sendMessage(message);
+            }else{
+                if (msg.contains("DATE")) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("#TIME");
+                    Calendar calendar = Calendar.getInstance();
+                    sb.append(calendar.get(Calendar.YEAR));
+                    sb.append(calendar.get(Calendar.MONTH) / 10 < 1 ? "0" : "");
+                    // 更改get(Calendar.MONTH +1) 为 get(Calendar.MONTH )+1,同时整体进行了时间格式标准化处理(对于只有个位数的时间进行加 0处理)
+                    sb.append(calendar.get(Calendar.MONTH) + 1);
+                    sb.append(calendar.get(Calendar.DATE) / 10 < 1 ? "0" : "");
+                    sb.append(calendar.get(Calendar.DATE));
+                    sb.append(calendar.get(Calendar.HOUR_OF_DAY) / 10 < 1 ? "0" : "");
+                    sb.append(calendar.get(Calendar.HOUR_OF_DAY));
+                    sb.append(calendar.get(Calendar.MINUTE) / 10 < 1 ? "0" : "");
+                    sb.append(calendar.get(Calendar.MINUTE));
+                    sb.append(calendar.get(Calendar.SECOND) / 10 < 1 ? "0" : "");
+                    sb.append(calendar.get(Calendar.SECOND));
+
+                    Log.d("123456", "holdBluetoothConnection: ");
+                    sendDataToBracelet(sb.toString());
+                }
+
+                if (msg.contains("TEMP"))
+                {
+                    String[] strings = msg.split("#TEMP");
+                    Message message = Message.obtain();
+                    message.what = BRACELET;
+                    Bundle bundle = new Bundle();
+                    bundle.putString("temp", strings[0]);
+                    message.setData(bundle);
+                    handler.sendMessage(message);
+                }
             }
+
         });
+
         btThread.start();
     }
 
     /**
-     * 开启WiFi监听线程
+<<<<<<< HEAD
+     * 从连接后返回MainActivity时会被调用
      */
-    void holdWiFiConnection()
+
+    private void holdWiFiConnection()
+
     {
         wifiThread = new HoldConnectionThread(true, msg ->
         {
@@ -318,6 +364,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleMessage(Message msg)
     {
+        Log.d("handler", "handleMessage: "+msg.what);
         switch (msg.what)
         {
             case EXCEPTION:
@@ -336,7 +383,12 @@ public class MainActivity extends AppCompatActivity
                 else mBinding.appBarMain.windowControlLayout.reduce();
                 break;
             case BRACELET:
-                mBinding.appBarMain.tvTemperature.setText(msg.getData().getString("temp"));
+                String a="当前体温: "+msg.getData().getString("temp").substring(4,msg.getData().getString("temp").length())+"°C";
+                a = a.replaceAll("\r|\n", "");
+                mBinding.appBarMain.tvTemperature.setText(a);
+                break;
+            case FAILL:
+                mBinding.appBarMain.tvTemperature.setText("蓝牙指令有误");
                 break;
         }
     }
@@ -353,6 +405,7 @@ public class MainActivity extends AppCompatActivity
             case BLUETOOTH:
                 if (resultCode == RESULT_OK)
                 {
+                    Log.d("TAG", "onActivityResult: ");
                     mBinding.appBarMain.tvBraceletState.setVisibility(View.GONE);
                     holdBluetoothConnection();
                 }
@@ -378,11 +431,4 @@ public class MainActivity extends AppCompatActivity
         BaseApplication.shutdown();
     }
 
-    private static final int BLUETOOTH = 0;
-    private static final int WIFI = 1;
-    private static final int EXCEPTION = 2;
-    private static final int FAN = 3;
-    private static final int AIR_CONDITIONER = 4;
-    private static final int WINDOW = 5;
-    private static final int BRACELET = 6;
 }

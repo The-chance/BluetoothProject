@@ -21,9 +21,6 @@
         android:supportsRtl="true"
         android:theme="@style/MaterialAppTheme">
         <activity
-            android:name=".ui.RoomConnectActivity"
-            android:theme="@style/ImmersiveTheme" />
-        <activity
             android:name=".ui.WiFiConnectActivity"
             android:theme="@style/ImmersiveTheme" />
         <activity
