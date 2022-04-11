@@ -7,13 +7,13 @@
     <string name="location">未知</string>
     <string name="airConditioner">空调</string>
     <string name="airConditionerState">未知</string>
-    <string name="airConditionerTemperature">——°</string>
+    <string name="airConditionerTemperature">26°</string>
     <string name="fan">风扇</string>
     <string name="fanState">未知</string>
-    <string name="fanSpeed">——%</string>
+    <string name="fanSpeed">0档</string>
     <string name="window">窗户</string>
     <string name="windowWindSpeed">风速 ——</string>
-    <string name="windowState">—</string>
+    <string name="windowState">关</string>
     <string name="nav_header_subtitle">1721554825@qq.com</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_desc">Navigation header</string>

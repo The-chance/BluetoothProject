@@ -1,5 +1,6 @@
 package com.chenjimou.braceletdemo.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
@@ -148,10 +149,10 @@ public class MainActivity extends AppCompatActivity {
         mBinding.appBarMain.autoAdjustSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                BaseApplication.isAutoAdjust=b;
-                if(b){
+                BaseApplication.isAutoAdjust = b;
+                if (b) {
                     Toast.makeText(MainActivity.this, "自动调节已打开", Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     Toast.makeText(MainActivity.this, "自动调节已关闭", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -365,6 +366,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param msg 消息
      */
+    @SuppressLint("SetTextI18n")
     public void handleMessage(Message msg) {
         Log.d("handler", "handleMessage: " + msg.what);
         switch (msg.what) {
@@ -375,23 +377,29 @@ public class MainActivity extends AppCompatActivity {
                 if (msg.getData().getBoolean("isUp"))
                     mBinding.appBarMain.fanControlLayout.increase();
                 else mBinding.appBarMain.fanControlLayout.reduce();
+                mBinding.appBarMain.tvFanSpeed.setText(mBinding.appBarMain.fanControlLayout.getCurrentValue() + "档");
                 break;
             case AIR_CONDITIONER:
                 if (msg.getData().getBoolean("isUp"))
                     mBinding.appBarMain.airConditionerControlLayout.increase();
                 else mBinding.appBarMain.airConditionerControlLayout.reduce();
+                mBinding.appBarMain.tvAirConditionerTemperature.setText(mBinding.appBarMain.airConditionerControlLayout.getCurrentValue() + "°");
                 break;
             case WINDOW:
                 if (msg.getData().getBoolean("isUp"))
                     mBinding.appBarMain.windowControlLayout.increase();
                 else mBinding.appBarMain.windowControlLayout.reduce();
+                if (mBinding.appBarMain.windowControlLayout.getCurrentValue() == 0)
+                    mBinding.appBarMain.tvWindowState.setText("关");
+                else
+                    mBinding.appBarMain.tvWindowState.setText("开");
                 break;
             case BRACELET:
                 String temp = msg.getData().getString("temp").substring(4, msg.getData().getString("temp").length());
                 String a = "当前体温: " + temp + "°C";
                 a = a.replaceAll("\r|\n", "");
                 mBinding.appBarMain.tvTemperature.setText(a);
-                autoAdjust(BaseApplication.isAutoAdjust,temp);//自动调节
+                autoAdjust(BaseApplication.isAutoAdjust, temp);//自动调节
                 break;
             case FAILL:
                 mBinding.appBarMain.tvTemperature.setText("蓝牙指令有误");
