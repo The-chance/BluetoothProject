@@ -18,6 +18,7 @@ public class BaseApplication extends Application {
     public static BluetoothSocket btSocket; // 当前蓝牙通信使用的socket
     public static BluetoothDevice btDevice; // 对端蓝牙设备对象
     public static Socket wifiSocket; // 当前WiFi通信使用的socket
+    public static boolean isAutoAdjust=false;//是否处于自动调节模式
 
     @Override
     public void onCreate()

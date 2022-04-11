@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/holo_green_light"
     android:fitsSystemWindows="true">
-    
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white">
-    
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
-    
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -27,8 +26,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:popupTheme="@style/ToolBarPopupTheme" >
-        
+            app:popupTheme="@style/ToolBarPopupTheme">
+
+            <Switch
+                android:trackTint="#1E88E5"
+                android:layout_marginStart="10dp"
+                android:id="@+id/autoAdjustSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" />
+
             <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
@@ -37,9 +44,9 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-    
+
         </androidx.appcompat.widget.Toolbar>
-    
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout2"
             android:layout_width="0dp"
@@ -76,14 +83,14 @@
                 app:layout_constraintEnd_toStartOf="@+id/guideline2"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintTop_toBottomOf="@+id/tv_temperature" />
-        
+
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.5" />
-        
+
             <TextView
                 android:id="@+id/tv_airQuality"
                 android:layout_width="wrap_content"
@@ -96,7 +103,7 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@+id/guideline2"
                 app:layout_constraintTop_toBottomOf="@+id/tv_temperature" />
-        
+
             <ImageView
                 android:id="@+id/iv_weather"
                 android:layout_width="25dp"
@@ -109,7 +116,7 @@
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
-        
+
             <TextView
                 android:id="@+id/tv_location"
                 android:layout_width="wrap_content"
@@ -122,7 +129,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/iv_weather"
                 app:layout_constraintStart_toEndOf="@+id/iv_weather"
                 app:layout_constraintTop_toTopOf="@+id/iv_weather" />
-        
+
             <TextView
                 android:id="@+id/tv_braceletState"
                 android:layout_width="wrap_content"
@@ -133,9 +140,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-    
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-    
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout3"
             android:layout_width="0dp"
@@ -146,11 +153,11 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:background="@android:color/holo_blue_light"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayout4">
-        
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
             <TextView
                 android:id="@+id/tv_airConditioner"
                 android:layout_width="wrap_content"
@@ -162,7 +169,7 @@
                 android:textColor="@android:color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-        
+
             <TextView
                 android:id="@+id/tv_airConditionerState"
                 android:layout_width="wrap_content"
@@ -175,20 +182,20 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_airConditioner" />
-        
-<!--            <TextView-->
-<!--                android:id="@+id/tv_airConditionerTemperature"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="16dp"-->
-<!--                android:layout_marginEnd="16dp"-->
-<!--                android:layout_marginRight="16dp"-->
-<!--                android:text="@string/airConditionerTemperature"-->
-<!--                android:textColor="@android:color/white"-->
-<!--                android:textSize="30sp"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-        
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tv_airConditionerTemperature"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="16dp"-->
+            <!--                android:layout_marginEnd="16dp"-->
+            <!--                android:layout_marginRight="16dp"-->
+            <!--                android:text="@string/airConditionerTemperature"-->
+            <!--                android:textColor="@android:color/white"-->
+            <!--                android:textSize="30sp"-->
+            <!--                app:layout_constraintEnd_toEndOf="parent"-->
+            <!--                app:layout_constraintTop_toTopOf="parent" />-->
+
             <com.chenjimou.braceletdemo.widght.ControlLayout
                 android:id="@+id/airConditionerControlLayout"
                 android:layout_width="0dp"
@@ -201,9 +208,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
-    
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-    
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout4"
             android:layout_width="0dp"
@@ -219,7 +226,7 @@
             app:layout_constraintEnd_toStartOf="@+id/guideline1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout3">
-        
+
             <TextView
                 android:id="@+id/tv_fan"
                 android:layout_width="wrap_content"
@@ -231,20 +238,20 @@
                 android:textColor="@android:color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-        
-<!--            <TextView-->
-<!--                android:id="@+id/tv_fanSpeed"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="16dp"-->
-<!--                android:layout_marginEnd="16dp"-->
-<!--                android:layout_marginRight="16dp"-->
-<!--                android:text="@string/fanSpeed"-->
-<!--                android:textColor="@android:color/white"-->
-<!--                android:textSize="20sp"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-        
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tv_fanSpeed"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="16dp"-->
+            <!--                android:layout_marginEnd="16dp"-->
+            <!--                android:layout_marginRight="16dp"-->
+            <!--                android:text="@string/fanSpeed"-->
+            <!--                android:textColor="@android:color/white"-->
+            <!--                android:textSize="20sp"-->
+            <!--                app:layout_constraintEnd_toEndOf="parent"-->
+            <!--                app:layout_constraintTop_toTopOf="parent" />-->
+
             <TextView
                 android:id="@+id/tv_fanState"
                 android:layout_width="wrap_content"
@@ -257,7 +264,7 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_fan" />
-        
+
             <com.chenjimou.braceletdemo.widght.ControlLayout
                 android:id="@+id/fanControlLayout"
                 android:layout_width="0dp"
@@ -270,9 +277,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
-    
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-    
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -287,7 +294,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline1"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout3">
-        
+
             <TextView
                 android:id="@+id/tv_window"
                 android:layout_width="wrap_content"
@@ -299,7 +306,7 @@
                 android:textColor="@android:color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-        
+
             <TextView
                 android:id="@+id/tv_windowWindSpeed"
                 android:layout_width="wrap_content"
@@ -312,20 +319,20 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_window" />
-        
-<!--            <TextView-->
-<!--                android:id="@+id/tv_windowState"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="16dp"-->
-<!--                android:layout_marginEnd="16dp"-->
-<!--                android:layout_marginRight="16dp"-->
-<!--                android:text="@string/windowState"-->
-<!--                android:textColor="@android:color/white"-->
-<!--                android:textSize="30sp"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-    
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tv_windowState"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="16dp"-->
+            <!--                android:layout_marginEnd="16dp"-->
+            <!--                android:layout_marginRight="16dp"-->
+            <!--                android:text="@string/windowState"-->
+            <!--                android:textColor="@android:color/white"-->
+            <!--                android:textSize="30sp"-->
+            <!--                app:layout_constraintEnd_toEndOf="parent"-->
+            <!--                app:layout_constraintTop_toTopOf="parent" />-->
+
             <com.chenjimou.braceletdemo.widght.ControlLayout
                 android:id="@+id/windowControlLayout"
                 android:layout_width="0dp"
@@ -339,9 +346,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:multiple="10" />
-    
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-        
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

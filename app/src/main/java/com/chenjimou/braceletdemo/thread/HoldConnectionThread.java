@@ -55,11 +55,11 @@ public class HoldConnectionThread extends Thread
 
                 Log.d("TAG", "run: "+"循环结束");
                 String data = sb.toString();
-                Log.d("TAGG", "run: "+sb.toString().length()+sb.toString());
+                Log.d("TAG", "run: "+sb.toString().length()+sb.toString());
 
-                if ((sb.toString().length()!=11&&sb.toString().contains("TEMP"))){
+                if ((sb.toString().length()!=9 &&sb.toString().contains("TEMP"))){
                     Log.d("TAG", "进入else");
-                    callback.onResponse("faill");
+                    callback.onResponse("fail");
                     sb.setLength(0);
                 }else{
                     //用九位字符限制输入必须符合格式要求
