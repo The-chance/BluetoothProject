@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
         if (tempNum < 30.75) {
             //关窗
             sendDataToWindow("#MC" + "000", false);
-        } else if (tempNum >= 30.75) {
+        } else if (tempNum >= 30.75&&tempNum<31.95) {
             //开窗
             sendDataToWindow("#MC" + "001", true);
         } else if (tempNum < 31.95) {
