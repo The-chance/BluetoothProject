@@ -1,13 +1,13 @@
 <resources>
-    <string name="app_name">BraceletDemo</string>
+    <string name="app_name">智慧家居</string>
     <string name="braceletState">手环未连接</string>
     <string name="braceletTemperature">——°</string>
     <string name="humidity">湿度 ——%</string>
     <string name="airQuality">PM2.5 ——</string>
     <string name="location">未知</string>
     <string name="airConditioner">空调</string>
-    <string name="airConditionerState">未知</string>
-    <string name="airConditionerTemperature">26°</string>
+    <string name="airConditionerState">关</string>
+    <string name="airConditionerTemperature">26</string>
     <string name="fan">风扇</string>
     <string name="fanState">未知</string>
     <string name="fanSpeed">0档</string>

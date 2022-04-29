@@ -67,31 +67,6 @@ public class HoldConnectionThread extends Thread
                     callback.onResponse(sb.toString());
                     sb.setLength(0); // 重置stringBuilder
                 }
-
-
-
-
-
-//                String resultData = null;      //需要返回的结果
-//                byte[] data=new byte[1024];
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                int len=0;
-//                StringBuffer a=new StringBuffer();
-//                try{
-//                    Log.d("TAG", "run: while前");
-//                    while((len = tmpin.read()) != -1&&len!='#') {
-//                        byteArrayOutputStream.write(data, 0, len);
-//                        char c = (char) len;
-//                        a.append(c);
-//                        Log.d("TAG", "run: "+c);
-//                    }
-//                    Log.d("TAG", "run: while后");
-//                }catch(IOException e){
-//                    e.printStackTrace();
-//                }
-//                String str = a.toString();
-//                Log.d("TAG", "字符串："+str);
-//                callback.onResponse(str);
             }
 
 

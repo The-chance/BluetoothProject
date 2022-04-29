@@ -6,6 +6,7 @@ import static com.chenjimou.braceletdemo.order.OrderType.TYPE_AIR_CONDITIONER;
 import static com.chenjimou.braceletdemo.order.OrderType.TYPE_BRACELET;
 import static com.chenjimou.braceletdemo.order.OrderType.TYPE_FAN;
 import static com.chenjimou.braceletdemo.order.OrderType.TYPE_WINDOW;
+import static com.chenjimou.braceletdemo.order.OrderType.TYPE_MODE;
 
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -49,6 +50,8 @@ public class Order implements Runnable
                     BaseApplication.btSocket.getOutputStream().write(order.getBytes());
                     Log.d(TAG, "run: "+TYPE_BRACELET);
                     break;
+                case TYPE_MODE:
+                    Log.d(TAG, "run: "+TYPE_MODE);
                 case TYPE_AIR_CONDITIONER:
                     Log.d(TAG, "run: "+TYPE_AIR_CONDITIONER);
                 case TYPE_WINDOW:

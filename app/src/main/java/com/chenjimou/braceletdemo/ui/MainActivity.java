@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         init();
     }
 
+
     /**
      * 初始化
      */
@@ -80,21 +81,43 @@ public class MainActivity extends AppCompatActivity {
             public void onSendData(int type) {
                 mBinding.appBarMain.autoAdjustSwitch.setChecked(false);
                 int currentValue = mBinding.appBarMain.airConditionerControlLayout.getCurrentValue();
+                boolean isOpen = mBinding.appBarMain.airConditionerControlLayout.isOpen();
                 switch (type) {
                     case ControlLayout.Type.TYPE_UP:
+                        if (!isOpen) {
+                            Toast.makeText(MainActivity.this, "空调未开启", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         if (currentValue + 1 > 30) {
                             return;
                         }
-                        sendDataToAirConditioner("#KT" + (currentValue + 1), true);
+                        sendDataToAirConditioner("#KT" + (currentValue + 1) + ".00COLD", true, true);
                         break;
                     case ControlLayout.Type.TYPE_DOWN:
+                        if (!isOpen) {
+                            Toast.makeText(MainActivity.this, "空调未开启", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         if (currentValue - 1 < 16) {
                             return;
                         }
-                        sendDataToAirConditioner("#KT" + (currentValue - 1), false);
+                        sendDataToAirConditioner("#KT" + (currentValue - 1) + ".00COLD", false, true);
                         break;
                     case ControlLayout.Type.TYPE_SHUTDOWN:
-                        sendDataToAirConditioner("#KT" + 26, false);
+                        //打开或关闭空调
+                        if (isOpen) {
+                            sendDataToAirConditioner("#KT00.00SHUTDOWN", false, false);
+                        } else {
+                            //恢复空调26度
+                            if (currentValue > 26) {
+                                for (int i = 0; i < currentValue - 26; i++)
+                                    mBinding.appBarMain.airConditionerControlLayout.reduce();
+                            } else {
+                                for (int i = 0; i < 26 - currentValue; i++)
+                                    mBinding.appBarMain.airConditionerControlLayout.increase();
+                            }
+                            sendDataToAirConditioner("#KT26.00OPEN", false, false);
+                        }
                         break;
                 }
             }
@@ -111,16 +134,19 @@ public class MainActivity extends AppCompatActivity {
                         if (currentValue + 1 > 3) {
                             return;
                         }
-                        sendDataToFan("#FS0" + (currentValue + 1), true);
+                        sendDataToFan("#FS0" + (currentValue + 1), true, true);
                         break;
                     case ControlLayout.Type.TYPE_DOWN:
                         if (currentValue - 1 < 0) {
                             return;
                         }
-                        sendDataToFan("#FS0" + (currentValue - 1), false);
+                        sendDataToFan("#FS0" + (currentValue - 1), false, true);
                         break;
                     case ControlLayout.Type.TYPE_SHUTDOWN:
-                        sendDataToFan("#FS0" + 0, false);
+                        //关风扇
+                        for (int i = 0; i < currentValue; i++)
+                            mBinding.appBarMain.fanControlLayout.reduce();
+                        sendDataToFan("#FS00", false, true);
                         break;
                 }
             }
@@ -131,14 +157,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSendData(int type) {
                 mBinding.appBarMain.autoAdjustSwitch.setChecked(false);
-//                int currentValue = mBinding.appBarMain.fanControlLayout.getCurrentValue();
                 switch (type) {
                     case ControlLayout.Type.TYPE_UP:
                         sendDataToWindow("#MC" + "001", true);
                         break;
                     case ControlLayout.Type.TYPE_DOWN:
-//                        sendDataToWindow("#MC" + "000", false);
-//                        break;
                     case ControlLayout.Type.TYPE_SHUTDOWN:
                         sendDataToWindow("#MC" + "000", false);
                         break;
@@ -151,9 +174,16 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 BaseApplication.isAutoAdjust = b;
                 if (b) {
+                    mBinding.appBarMain.controlMode.setText("自动模式");
                     Toast.makeText(MainActivity.this, "自动调节已打开", Toast.LENGTH_SHORT).show();
+                    sendDataToChooseMode("#MODE1");//发自动模式指令
                 } else {
+                    mBinding.appBarMain.controlMode.setText("手动模式");
                     Toast.makeText(MainActivity.this, "自动调节已关闭", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < 10; i++) {
+                        if(BaseApplication.wifiSocket==null) return;
+                        sendDataToChooseMode("#MODE0");//发手动模式指令
+                    }
                 }
             }
         });
@@ -184,11 +214,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.wifiConnection:
                 startActivityForResult(new Intent(MainActivity.this, WiFiConnectActivity.class), WIFI);
                 return true;
-//            case R.id.roomConnection:
-//                startActivity(new Intent(MainActivity.this, RoomConnectActivity.class));
-//                return true;
-//            case R.id.connectWindow:
-//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -227,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
      * @param order 指令
      * @param isUp  true为升高温度，false为降低温度
      */
-    private void sendDataToAirConditioner(String order, boolean isUp) {
+    private void sendDataToAirConditioner(String order, boolean isUp, boolean isChange) {
         Dispatcher.getInstance().sendOrder(new Order(OrderType.TYPE_AIR_CONDITIONER, order, new Order.Callback() {
             @Override
             public void onFailure(Exception e) {
@@ -239,7 +264,9 @@ public class MainActivity extends AppCompatActivity {
                 Message message = Message.obtain();
                 message.what = AIR_CONDITIONER;
                 Bundle bundle = new Bundle();
+                bundle.putString("order", order);
                 bundle.putBoolean("isUp", isUp);
+                bundle.putBoolean("isChange", isChange);
                 message.setData(bundle);
                 handler.sendMessage(message);
             }
@@ -252,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
      * @param order 指令
      * @param isUp  true为加大风速，false为降低风速
      */
-    private void sendDataToFan(String order, boolean isUp) {
+    private void sendDataToFan(String order, boolean isUp, boolean isChange) {
         Dispatcher.getInstance().sendOrder(new Order(OrderType.TYPE_FAN, order, new Order.Callback() {
             @Override
             public void onFailure(Exception e) {
@@ -265,8 +292,27 @@ public class MainActivity extends AppCompatActivity {
                 message.what = FAN;
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("isUp", isUp);
+                bundle.putBoolean("isChange", isChange);
                 message.setData(bundle);
                 handler.sendMessage(message);
+            }
+        }));
+    }
+
+    /**
+     * 发送指令切换调节模式
+     * @param order 指令
+     */
+    private void sendDataToChooseMode(String order) {
+        Dispatcher.getInstance().sendOrder(new Order(OrderType.TYPE_MODE, order, new Order.Callback() {
+            @Override
+            public void onFailure(Exception e) {
+                handler.sendEmptyMessage(EXCEPTION);
+            }
+
+            @Override
+            public void onResponse() {
+
             }
         }));
     }
@@ -374,16 +420,26 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "指令发送失败，请重试！", Toast.LENGTH_SHORT).show();
                 break;
             case FAN:
-                if (msg.getData().getBoolean("isUp"))
-                    mBinding.appBarMain.fanControlLayout.increase();
-                else mBinding.appBarMain.fanControlLayout.reduce();
+                if (msg.getData().getBoolean("isChange")) {
+                    if (msg.getData().getBoolean("isUp"))
+                        mBinding.appBarMain.fanControlLayout.increase();
+                    else mBinding.appBarMain.fanControlLayout.reduce();
+                }
                 mBinding.appBarMain.tvFanSpeed.setText(mBinding.appBarMain.fanControlLayout.getCurrentValue() + "档");
                 break;
             case AIR_CONDITIONER:
-                if (msg.getData().getBoolean("isUp"))
-                    mBinding.appBarMain.airConditionerControlLayout.increase();
-                else mBinding.appBarMain.airConditionerControlLayout.reduce();
-                mBinding.appBarMain.tvAirConditionerTemperature.setText(mBinding.appBarMain.airConditionerControlLayout.getCurrentValue() + "°");
+                if (msg.getData().getBoolean("isChange")) {
+                    if (msg.getData().getBoolean("isUp"))
+                        mBinding.appBarMain.airConditionerControlLayout.increase();
+                    else mBinding.appBarMain.airConditionerControlLayout.reduce();
+                } else {
+                    mBinding.appBarMain.airConditionerControlLayout.setOpen(msg.getData().getString("order").equals("#KT26.00OPEN"));
+                }
+                if (mBinding.appBarMain.airConditionerControlLayout.isOpen())
+                    mBinding.appBarMain.tvAirConditionerState.setText("开");
+                else
+                    mBinding.appBarMain.tvAirConditionerState.setText("关");
+                mBinding.appBarMain.tvAirConditionerTemperature.setText(mBinding.appBarMain.airConditionerControlLayout.getCurrentValue() + "");
                 break;
             case WINDOW:
                 if (msg.getData().getBoolean("isUp"))
@@ -416,32 +472,58 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         double tempNum = Double.parseDouble(temp);
-        if (tempNum < 30.75) {
+        /**对门窗的按制**/
+        if (tempNum <= 30.75) {
             //关窗
-            sendDataToWindow("#MC" + "000", false);
-        } else if (tempNum >= 30.75&&tempNum<31.95) {
+            sendDataToWindow("#MC000", false);//发送指令
+        } else if (tempNum > 30.75 && tempNum <= 31.95) {
             //开窗
-            sendDataToWindow("#MC" + "001", true);
-        } else if (tempNum < 31.95) {
-            //关风扇
-            mBinding.appBarMain.fanControlLayout.setCurrentValue(0);
-            sendDataToFan("#FS00", false);
-        } else if (tempNum >= 31.95 && tempNum <= 32.88) {
+            sendDataToWindow("#MC001", true);//发送指令
+        }
+        /**对风扇的按制**/
+        if (tempNum > 31.95 && tempNum <= 32.88) {
+            //更新UI属性
+            int currentValue = mBinding.appBarMain.fanControlLayout.getCurrentValue();
+            if (mBinding.appBarMain.fanControlLayout.getCurrentValue() > 1) {
+                for (int i = 0; i < currentValue - 1; i++)
+                    mBinding.appBarMain.fanControlLayout.reduce();
+            } else if (mBinding.appBarMain.fanControlLayout.getCurrentValue() < 1) {
+                mBinding.appBarMain.fanControlLayout.increase();
+            }
             //风扇1
-            mBinding.appBarMain.fanControlLayout.setCurrentValue(0);
-            sendDataToFan("#FS01", true);
-        } else if (tempNum >= 32.88 && tempNum <= 33.3) {
+
+            sendDataToFan("#FS01", false, false);//发送指令
+        } else if (tempNum > 32.88 && tempNum <= 33.3) {
+            //更新UI属性
+            int currentValue = mBinding.appBarMain.fanControlLayout.getCurrentValue();
+            if (mBinding.appBarMain.fanControlLayout.getCurrentValue() > 2) {
+                mBinding.appBarMain.fanControlLayout.reduce();
+            } else if (mBinding.appBarMain.fanControlLayout.getCurrentValue() < 2) {
+                for (int i = 0; i < 2 - currentValue; i++)
+                    mBinding.appBarMain.fanControlLayout.increase();
+            }
             //风扇2
-            mBinding.appBarMain.fanControlLayout.setCurrentValue(1);
-            sendDataToFan("#FS02", true);
-        } else if (tempNum >= 33.3 && tempNum <= 34.03) {
+            sendDataToFan("#FS02", true, false);//发送指令
+        } else if (tempNum > 33.3 && tempNum <= 34.03) {
+            //更新UI属性
+            for (int i = 0; i < 3; i++)
+                mBinding.appBarMain.fanControlLayout.increase();
             //风扇3
-            mBinding.appBarMain.fanControlLayout.setCurrentValue(2);
-            sendDataToFan("#FS03", true);
-        } else if (tempNum > 34.03) {
-            //开空调26度
-            mBinding.appBarMain.airConditionerControlLayout.setCurrentValue(25);
-            sendDataToAirConditioner("#KT" + 26, true);
+            sendDataToFan("#FS03", true, false);//发送指令
+        }
+        /**对空调的按制**/
+        if (tempNum > 34.03) {
+            //更新UI属性
+            int currentValue = mBinding.appBarMain.airConditionerControlLayout.getCurrentValue();
+            if (currentValue > 26) {
+                for (int i = 0; i < currentValue - 26; i++)
+                    mBinding.appBarMain.airConditionerControlLayout.reduce();
+            } else {
+                for (int i = 0; i < 26 - currentValue; i++)
+                    mBinding.appBarMain.airConditionerControlLayout.increase();
+            }
+            //恢复空调26度的UI
+            sendDataToAirConditioner("#KT26.00OPEN", true, false);//发送指令 开空调26度
         }
     }
 
@@ -462,6 +544,14 @@ public class MainActivity extends AppCompatActivity {
             case WIFI:
                 if (resultCode == RESULT_OK) {
                     holdWiFiConnection();
+                    sendDataToWindow("#MC" + "000", false);
+//                    if (BaseApplication.isAutoAdjust) {
+//                        sendDataToFan("#MODE1",false,false);
+//                        mBinding.appBarMain.controlMode.setText("自动模式");
+//                    } else {
+//                        sendDataToFan("#MODE0",false,false);
+//                        mBinding.appBarMain.controlMode.setText("手动模式");
+//                    }
                 }
                 break;
         }

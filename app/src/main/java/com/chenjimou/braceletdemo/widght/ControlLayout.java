@@ -24,6 +24,8 @@ public class ControlLayout extends FrameLayout implements View.OnClickListener
     private int currentValue;
     private int totalValue;
     private int multiple = 1;
+    private boolean isOpen=false;
+
     private OnSendDataListener listener;
 
     public ControlLayout(@NonNull Context context)
@@ -151,5 +153,13 @@ public class ControlLayout extends FrameLayout implements View.OnClickListener
             currentValue -= multiple;
             progressView.setProportion((currentValue - startValue) * 1f / totalValue);
         }
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
     }
 }

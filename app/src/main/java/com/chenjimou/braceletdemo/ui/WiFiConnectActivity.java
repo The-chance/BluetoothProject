@@ -250,8 +250,8 @@ public class WiFiConnectActivity extends AppCompatActivity {
                 case "WiFiModeUtil.Connect.Succeed":
                     mBinding.connectStatus.setText("连接成功");
                     Toast.makeText(WiFiConnectActivity.this, "连接成功!", Toast.LENGTH_SHORT).show();
-                    finish();
                     connectingSum=0;
+                    finish();
                     break;
                 case "WiFiModeUtil.Connect.Fail":
                     mBinding.connectStatus.setText("连接失败");

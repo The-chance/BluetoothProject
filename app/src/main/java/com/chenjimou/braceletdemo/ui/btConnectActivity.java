@@ -186,6 +186,10 @@ public class btConnectActivity extends AppCompatActivity {
             Toast.makeText(btConnectActivity.this, "配对失败，Android版本不能低于4.4！", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * 进行连接
+     * @param device
+     */
     private void tryConnect(BluetoothDevice device) {
         new Thread(() -> {
             try {

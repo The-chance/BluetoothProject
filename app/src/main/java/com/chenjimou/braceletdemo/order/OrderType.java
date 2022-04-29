@@ -6,4 +6,5 @@ public enum OrderType
     TYPE_AIR_CONDITIONER,
     TYPE_FAN,
     TYPE_WINDOW,
+    TYPE_MODE,
 }
