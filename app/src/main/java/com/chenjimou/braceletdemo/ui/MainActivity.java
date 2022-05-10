@@ -452,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case BRACELET:
                 String temp = msg.getData().getString("temp").substring(4, msg.getData().getString("temp").length());
-                String a = "当前体温: " + temp + "°C";
+                String a = "当前皮肤温度: " + temp + "°C";
                 a = a.replaceAll("\r|\n", "");
                 mBinding.appBarMain.tvTemperature.setText(a);
                 autoAdjust(BaseApplication.isAutoAdjust, temp);//自动调节
